@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+	<display-name>ajaxweb</display-name>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<filter>
+		<filter-name>CheckLogin</filter-name>
+		<filter-class>org.news.filter.CheckLogin</filter-class>
+		<init-param>
+			<param-name>whitelist</param-name>
+			<param-value>do_index_list|do_category_list|do_latest_list|index.jsp|do_news_read|do_comment_list|do_comment_add|newsread.jsp|do_login</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CheckLogin</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>CharEncoding</filter-name>
+		<filter-class>org.news.filter.CharEncoding</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>
