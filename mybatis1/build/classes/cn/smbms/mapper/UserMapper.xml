@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD  mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.smbms.mapper.UserMapper">
+
+  	<select id="count" resultType="int">
+  		select count(1) as count from smbms_user
+  	</select>
+  	<select id="getUserList" resultType="User">
+  		select * from smbms_user
+  	</select>
+  	 <select id="getUserByUserName" parameterType="string" resultType="User">
+  		select * from smbms_user where userName like concat("%",#{userName},"%")
+  	</select>
+  	
+  	
+  	<select id="getUserByConditions1" parameterType="User" resultType="User">
+  		select * from smbms_user where userName like concat("%",#{userName},"%")
+  		and userRole=#{userRole}
+  	</select>
+  	
+  	
+  	<select id="getUserByConditions2" parameterType="map" resultType="User">
+  		select * from smbms_user where userName like concat("%",#{userName},"%")
+  		and userRole=#{userRole}
+  	</select>
+  	
+  	<resultMap type="User" id="userAndRole">
+  		
+  		<!-- <id column="id" property="id"/> -->
+  		<result column="roleName" property="userRoleName"/>
+  	</resultMap>
+  	 	<select id="getUserByConditions3" parameterType="map" resultMap="userAndRole">
+  		select u.*,r.roleName from smbms_user u,smbms_role r
+  		 where u.userRole=r.id
+  		 and u.userName like concat("%",#{userName},"%")
+  		and u.userRole=#{userRole}
+  	</select>
+  	<insert id="insert" parameterType="User">
+  		insert into smbms_user(userCode,userName,userPassword,gender,
+		birthday,phone,address,userRole,createdBy,creationDate)
+		values(#{userCode},#{userName},#{userPassword},#{gender},#{birthday}
+		,#{phone},#{address},#{userRole},#{createdBy},#{creationDate})
+  	</insert>
+  	
+  	<update id="update" parameterType="User">
+  		update smbms_user set userName=#{userName}
+  		where id=#{id}
+  	</update>
+  	
+  	<delete id="delete" parameterType="int">
+  		delete from smbms_user where id=#{id}
+  	</delete>
+  	
+  		<update id="update2">
+  		update smbms_user set userName=#{userName}
+  		where id=#{id}
+  	</update>
+  	
+  	<resultMap type="User" id="userAndRole2">
+  		<id column="id" property="id"/>
+  		<result column="userCode" property="userCode"/> 
+  		
+  		<association property="role" javaType="Role">
+  			<id column="r_id" property="id"/>
+  			<result column="roleCode" property="roleCode"/>
+  			<result column="roleName" property="roleName"/>
+  		</association>
+  	</resultMap>
+  	
+  	<select id="getUserAndRole" resultMap="userAndRole2">
+  		select u.*,r.id as r_id,r.roleCode,r.roleName
+  		from smbms_user u,smbms_role r
+  		where u.userRole=r.id
+  	</select>
+  	
+  	
+<!--   	<update id="update" parameterType="User">
+  		update smbms_user
+  		<trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+  			<if test="userName!=null and userName!=''">userName=#{userName}</if>
+  			<if test="userCode!=null and userCode!=''">userCode=#{userCode}</if>
+  			<if test="userPassword!=null and userPassword!=''">userPassword=#{userPassword}</if>
+  		
+  		</trim>
+  	
+  	</update> -->
+  	
+  	<select id="getUserByUserRole1" resultType="User">
+  		select * from smbms_user where userRole in
+  		<foreach collection="array" item="roles"
+  			open="(" separator="," close=")">
+  			#{roles}
+  		</foreach> 		 
+  	</select>
+  	
+  		<select id="getUserByUserRole3" resultType="User">
+  		select * from smbms_user where userRole in
+  		<foreach collection="roles" item="roleMap"
+  			open="(" separator="," close=")">
+  			#{roleMap}
+  		</foreach> 		 
+  		</select>
+  		
+  		<select id="getUserByChoose" resultType="User" parameterType="User">
+  			select * from smbms_user where 1=1
+  			<choose>
+  				<when test="userName!=null and userName!=''">
+  					and userName like concat('%',#{userName},'%')
+  				</when>
+  				<when test="userCode!=null and userCode!=''">
+  					and userCode like concat('%',#{userCode},'%')
+  				</when>
+  				<when test="gender!=null">
+  					and gender=#{gender}
+  				</when>
+  				<!-- <otherwise>
+  					and gender=#{gender}
+  				</otherwise> -->
+  			</choose>
+  		</select>
+  		
+  		<select id="getUserByConditions11" parameterType="User" resultType="User">
+		select * from smbms_user
+		<!-- <where> -->
+		<trim prefix="where" prefixOverrides="and">
+			<if test="userName!=null and userName!=''">
+				and userName like concat('%',#{userName},'%')
+			</if>
+			<if test="userRole!=null">
+				and userRole = #{userRole}
+			</if>
+		</trim>
+		<!-- </where> -->
+	</select>
+	
+		<select id="getUserByConditions12" parameterType="map" resultMap="userAndRole">
+		select u.*,r.roleName from smbms_user u,smbms_role r
+		where u.userRole = r.id
+		<if test="userName!=null and userName!=''">
+			and u.userName like concat('%',#{userName},'%')
+		</if>
+		<if test="userRole!=null">
+			and u.userRole = #{userRole}
+		</if>
+	</select>
+	
+	<update id="update3" parameterType="User">
+		update smbms_user 
+		<!-- set userName=#{userName},userCode=#{userCode},
+		userPassword=#{userPassword} -->
+		<!-- <set>
+			<if test="userName!=null and userName!=''">userName=#{userName},</if>
+			<if test="userCode!=null and userCode!=''">userCode=#{userCode},</if>
+			<if test="userPassword!=null and userPassword!=''">userPassword=#{userPassword},</if>
+		</set>
+		where id=#{id} -->
+		<trim prefix="set" suffixOverrides="," suffix="where id=#{id}">
+			<if test="userName!=null and userName!=''">userName=#{userName},</if>
+			<if test="userCode!=null and userCode!=''">userCode=#{userCode},</if>
+			<if test="userPassword!=null and userPassword!=''">userPassword=#{userPassword},</if>
+		</trim>
+	</update>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
