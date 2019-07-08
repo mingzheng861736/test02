@@ -1,4 +1,4 @@
-package text1;
+package test1;
 
 public class test {
 
